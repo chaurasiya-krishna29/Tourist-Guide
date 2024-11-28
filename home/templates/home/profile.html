@@ -1,0 +1,35 @@
+{% extends 'home/base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">Profile</h1>
+        
+        <div class="space-y-4">
+            <div class="flex items-center">
+                <span class="w-32 text-gray-600">Email:</span>
+                <span class="text-gray-900">{{ user.email }}</span>
+            </div>
+            
+            <div class="flex items-center">
+                <span class="w-32 text-gray-600">First Name:</span>
+                <span class="text-gray-900">{{ user.first_name }}</span>
+            </div>
+            
+            <div class="flex items-center">
+                <span class="w-32 text-gray-600">Mobile:</span>
+                <span class="text-gray-900">{{ user.mobile }}</span>
+            </div>
+            
+            <div class="flex items-center">
+                <span class="w-32 text-gray-600">City:</span>
+                <span class="text-gray-900">{{ user.city }}</span>
+            </div>
+        </div>
+        
+        <div class="mt-8">
+            <a href="{% url 'index' %}" class="text-blue-600 hover:text-blue-800">← Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

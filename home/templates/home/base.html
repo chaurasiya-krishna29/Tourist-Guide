@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourist Guide</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-orange': '#FF6B35',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-blue-50 text-gray-800 font-['Roboto',sans-serif]">
+    <!-- Navbar -->
+    <nav class="bg-white shadow">
+        <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+            <div class="flex items-center">
+                <a href="{% url 'index' %}" class="text-xl font-semibold text-blue-600">TouristGuide</a>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="{% url 'index' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'index' %}current-page{% endif %}">Home</a>
+                <a href="{% url 'explore' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'explore' %}current-page{% endif %}">Explore</a>
+                <a href="{% url 'about' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'about' %}current-page{% endif %}">About</a>
+                <a href="{% url 'contact' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'contact' %}current-page{% endif %}">Contact</a>
+            </nav>
+            
+            <!-- Authentication Section -->
+            <div class="flex items-center">
+                {% if user.is_authenticated %}
+                    <span class="text-gray-700 mr-4">Welcome, {{ user.email }}</span>
+                    <a href="{% url 'profile' %}" class="text-blue-600 hover:text-blue-800 mr-4">Profile</a>
+                    <a href="{% url 'logout' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">Login</a>
+                    <a href="{% url 'signup' %}" class="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded hover:bg-blue-50">Sign Up</a>
+                {% endif %}
+            </div>
+
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden">
+            <a href="{% url 'index' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Home</a>
+            <a href="{% url 'explore' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Explore</a>
+            <a href="{% url 'about' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">About</a>
+            <a href="{% url 'contact' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Contact</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Profile</a>
+                <a href="{% url 'logout' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Content -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Tourist Guide. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-blue-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md responsive-container">
+        <div class="flex items-center justify-center mb-6">
+            <span class="text-blue-600 font-bold text-xl responsive-text">
+                Tourist Guider
+            </span>
+        </div>
+        
+        <h2 class="text-2xl font-bold mb-6 responsive-text">Sign up</h2>
+
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="p-4 {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %} rounded-md">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="name">Name</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="name" 
+                    name="first_name"
+                    placeholder="Name" 
+                    required 
+                    type="text"/>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="email">Email</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="email" 
+                    name="email"
+                    placeholder="name@example.com" 
+                    required 
+                    type="email"/>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="MobileNo">Mobile No</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="MobileNo" 
+                    name="mobile"
+                    placeholder="Enter 10 digit mobile number" 
+                    required 
+                    type="tel"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                    title="Please enter exactly 10 digits"/>
+                <p id="mobile-validation" class="text-sm text-red-500 mt-1 hidden">Mobile number must be exactly 10 digits</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="City">City</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="City" 
+                    name="city"
+                    placeholder="city" 
+                    required 
+                    type="text"/>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="password">Password</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="password" 
+                    name="password1"
+                    placeholder="password" 
+                    required 
+                    type="password"
+                    pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,18}$"
+                    title="Password must be 8-18 characters and include at least one uppercase letter, one number, and one special character (!@#$%^&*)"
+                    onkeyup="validatePassword()"/>
+                <p id="password-requirements" class="text-sm text-gray-600 mt-1">
+                    Password must contain:
+                    <span id="length" class="text-red-500">8-18 characters</span>,
+                    <span id="uppercase" class="text-red-500">uppercase letter</span>,
+                    <span id="number" class="text-red-500">number</span>,
+                    <span id="special" class="text-red-500">special character</span>
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2" for="confirm-password">Confirm Password</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    id="confirm-password" 
+                    name="password2"
+                    placeholder="password" 
+                    required 
+                    type="password"/>
+            </div>
+
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input class="form-checkbox text-blue-600" 
+                        required 
+                        type="checkbox" 
+                        id="terms" 
+                        onchange="toggleSignUpButton()"/>
+                    <span class="ml-2 text-gray-700 responsive-text">
+                        I accept the
+                        <a href="#" class="text-blue-600 font-bold hover:underline transition duration-300 ease-in-out">
+                            Terms and Conditions
+                        </a>
+                    </span>
+                </label>
+            </div>
+
+            <div class="mb-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline opacity-50 cursor-not-allowed transition duration-300 ease-in-out transform hover:scale-105" 
+                    type="submit" 
+                    id="signUpButton" 
+                    disabled>
+                    Sign up
+                </button>
+            </div>
+
+            <div class="text-center">
+                <p class="text-gray-700 responsive-text">
+                    Already have an account?
+                    <a class="text-blue-600 font-bold hover:underline transition duration-300 ease-in-out" href="{% url 'login' %}">
+                        Login Here
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    @media (max-width: 640px) {
+        .responsive-container {
+            width: 90%;
+            max-width: none;
+            padding: 1rem;
+        }
+        .responsive-text {
+            font-size: 0.875rem;
+        }
+    }
+</style>
+
+<script>
+    function toggleSignUpButton() {
+        const checkbox = document.getElementById('terms');
+        const signUpButton = document.getElementById('signUpButton');
+        signUpButton.disabled = !checkbox.checked;
+        signUpButton.classList.toggle('opacity-50', !checkbox.checked);
+        signUpButton.classList.toggle('cursor-not-allowed', !checkbox.checked);
+    }
+
+    function validatePassword() {
+        const password = document.getElementById('password').value;
+        const lengthCheck = password.length >= 8 && password.length <= 18;
+        const uppercaseCheck = /[A-Z]/.test(password);
+        const numberCheck = /[0-9]/.test(password);
+        const specialCheck = /[!@#$%^&*]/.test(password);
+
+        document.getElementById('length').className = lengthCheck ? 'text-green-500' : 'text-red-500';
+        document.getElementById('uppercase').className = uppercaseCheck ? 'text-green-500' : 'text-red-500';
+        document.getElementById('number').className = numberCheck ? 'text-green-500' : 'text-red-500';
+        document.getElementById('special').className = specialCheck ? 'text-green-500' : 'text-red-500';
+
+        const confirmPassword = document.getElementById('confirm-password');
+        if (confirmPassword.value) {
+            validatePasswordMatch();
+        }
+    }
+
+    function validatePasswordMatch() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const signUpButton = document.getElementById('signUpButton');
+        
+        if (password !== confirmPassword) {
+            document.getElementById('confirm-password').setCustomValidity("Passwords don't match");
+        } else {
+            document.getElementById('confirm-password').setCustomValidity('');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('confirm-password').addEventListener('keyup', validatePasswordMatch);
+
+        document.getElementById('MobileNo').addEventListener('input', function() {
+            const mobileValidation = document.getElementById('mobile-validation');
+            if (this.value.length !== 0 && this.value.length !== 10) {
+                mobileValidation.classList.remove('hidden');
+            } else {
+                mobileValidation.classList.add('hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}

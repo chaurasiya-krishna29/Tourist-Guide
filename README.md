@@ -1,0 +1,2 @@
+**Tourist Guide** 
+is a web app built with HTML, JavaScript, APIs, Django, and React. It helps users discover top-rated places near their location or planned destinations, offering insights through user ratings. Powered by real-time data and location-based recommendations, it’s your perfect travel companion! 🌍✨

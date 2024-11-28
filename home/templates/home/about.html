@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>TouristGuide - About Us</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+   body {
+     font-family: 'Roboto', sans-serif;
+   }
+   @media (max-width: 640px) {
+     .responsive-text {
+       font-size: 0.875rem;
+     }
+   }
+   .current-page {
+     color: #2563eb; /* blue-600 */
+     font-weight: bold;
+   }
+  </style>
+</head>
+<body class="bg-blue-50 text-gray-800 font-['Roboto',sans-serif]">
+  <header class="bg-white shadow">
+    <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+        <div class="flex items-center">
+            <a href="{% url 'index' %}" class="text-xl font-semibold text-blue-600">TouristGuide</a>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="relative hidden md:block">
+                <input type="text" placeholder="Search..." class="w-48 px-3 py-1 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent">
+                <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500">
+                    <i class="fas fa-search text-sm"></i>
+                </button>
+            </div>
+            <nav class="hidden md:flex space-x-4">
+                <a href="{% url 'index' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'index' %}current-page{% endif %}">Home</a>
+                <a href="{% url 'explore' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'explore' %}current-page{% endif %}">Explore</a>
+                <a href="{% url 'about' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'about' %}current-page{% endif %}">About</a>
+                <a href="{% url 'contact' %}" class="text-gray-700 hover:text-blue-600 {% if request.resolver_match.url_name == 'contact' %}current-page{% endif %}">Contact</a>
+            </nav>
+            {% if user.is_authenticated %}
+                <span class="text-gray-700 mr-4">Welcome, {{ user.email }}</span>
+                <!-- <a href="{% url 'profile' %}" class="text-blue-600 hover:text-blue-800 mr-4">Profile</a> -->
+                <a href="{% url 'logout' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">Login</a>
+                <a href="{% url 'signup' %}" class="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded hover:bg-blue-50">Sign Up</a>
+            {% endif %}
+            <button class="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden">
+        <a href="{% url 'index' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Home</a>
+        <a href="{% url 'explore' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Explore</a>
+        <a href="{% url 'about' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">About</a>
+        <a href="{% url 'contact' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Contact</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Profile</a>
+            <a href="{% url 'logout' %}" class="block py-2 px-4 text-gray-700 hover:bg-blue-100">Logout</a>
+        {% endif %}
+    </div>
+</header>
+  <main class="container mx-auto px-4 py-8 sm:py-16">
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div>
+     <h2 class="text-blue-600 text-lg font-semibold responsive-text">
+      Our Story
+     </h2>
+     <h1 class="text-3xl sm:text-4xl font-bold mt-2 responsive-heading">
+      Empowering Travelers Worldwide
+     </h1>
+     <p class="text-gray-700 mt-4 responsive-text">
+      TouristGuide was born from the passion of two avid travelers, Alex Chen and Sarah Thompson. They envisioned a platform that would make travel planning effortless and exciting for everyone. Their goal was to create a comprehensive guide that combines local insights with cutting-edge technology.
+     </p>
+     <p class="text-gray-700 mt-2 responsive-text">
+      Today, TouristGuide stands as a leading travel companion, offering personalized itineraries, real-time updates, and a community of global explorers. We're committed to making every journey an unforgettable adventure.
+     </p>
+    </div>
+    <div class="flex justify-center items-center">
+     <img alt="Travelers using TouristGuide app" class="rounded-lg shadow-lg w-full max-w-md" src="https://storage.googleapis.com/a1aa/image/LSg2Qx8G98Kfe0WrgGpqPmYiQb0MbDGARkjBvgHePoWFFBSnA.jpg"/>
+    </div>
+   </div>
+   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+   
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+     <h3 class="text-2xl sm:text-3xl font-bold text-blue-600">
+      1000+
+     </h3>
+     <p class="text-gray-600 mt-2 responsive-text">
+      Destinations Covered
+     </p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+     <h3 class="text-2xl sm:text-3xl font-bold text-blue-600">
+      4.8
+     </h3>
+     <p class="text-gray-600 mt-2 responsive-text">
+      Average User Rating
+     </p>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow text-center">
+     <h3 class="text-2xl sm:text-3xl font-bold text-blue-600">
+      500K+
+     </h3>
+     <p class="text-gray-600 mt-2 responsive-text">
+      Happy Travelers
+     </p>
+    </div>
+   </div>
+  </main>
+  <script>
+    // Function to highlight the current page in the navigation
+    function highlightCurrentPage() {
+        const currentPage = window.location.pathname.split("/").pop();
+        const navLinks = {
+            "index.html": "nav-home",
+            "explore.html": "nav-explore",
+            "about.html": "nav-about",
+            "contact.html": "nav-contact"
+        };
+
+        const currentNavId = navLinks[currentPage] || "nav-home";
+        document.getElementById(currentNavId).classList.add("current-page");
+    }
+
+    // Call the function when the page loads
+    window.addEventListener("load", highlightCurrentPage);
+
+    // Toggle mobile menu
+    document.querySelector('button').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

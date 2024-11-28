@@ -1,0 +1,775 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Explore Destinations</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-orange': '#FF6B35',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        @media (max-width: 640px) {
+            .responsive-text {
+                font-size: 0.875rem;
+            }
+        }
+        .current-page {
+            color: #2563eb; /* blue-600 */
+            font-weight: bold;
+        }
+        #slider {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        #slider > div {
+            flex: 0 0 100%;
+        }
+        .slider-container {
+            overflow: hidden;
+            position: relative;
+        }
+        @media (max-width: 640px) {
+            #slider img {
+                height: 300px;
+            }
+            
+            #slider .text-5xl {
+                font-size: 2rem;
+            }
+        }
+        /* Add smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Add loading state */
+        .loading {
+            position: relative;
+        }
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        /* Responsive text adjustments */
+        @media (max-width: 480px) {
+            .text-xl {
+                font-size: 1.1rem;
+            }
+            .text-lg {
+                font-size: 1rem;
+            }
+            .text-base {
+                font-size: 0.9rem;
+            }
+        }
+        /* Card hover effects */
+        .group:hover .group-hover\:scale-110 {
+            transform: scale(1.1);
+        }
+        /* Improved touch targets for mobile */
+        @media (max-width: 640px) {
+            button {
+                min-width: 44px;
+                min-height: 44px;
+            }
+        }
+        .text-yellow-400 {
+            color: #fbbf24;
+        }
+        .text-custom-orange {
+            color: #ff6b6b;
+        }
+        .chat-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .chat-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+            }
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+    </style>
+</head>
+<body class="bg-blue-50 text-gray-800 font-['Roboto',sans-serif]">
+    <header class="bg-white shadow">
+        <div class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+            <div class="flex items-center">
+                <a href="{% url 'index' %}" class="text-xl font-semibold text-blue-600">TouristGuide</a>
+            </div>
+            <div class="flex items-center justify-end space-x-6">
+                <form class="relative" onsubmit="return false;">
+                    <div class="relative hidden md:flex items-center">
+                        <input 
+                            type="text" 
+                            placeholder="Search location..." 
+                            class="w-48 px-3 py-1 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                        >
+                        <button type="submit" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500">
+                            <i class="fas fa-search text-sm"></i>
+                        </button>  
+                    </div>
+                </form>
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="{% url 'index' %}" class="text-gray-700 hover:text-blue-600" id="nav-home">Home</a>
+                    <a href="{% url 'explore' %}" class="text-gray-700 hover:text-blue-600" id="nav-explore">Explore</a>
+                    <a href="{% url 'about' %}" class="text-gray-700 hover:text-blue-600" id="nav-about">About</a>
+                    <a href="{% url 'contact' %}" class="text-gray-700 hover:text-blue-600" id="nav-contact">Contact</a>
+                </nav>
+                {% if user.is_authenticated %}
+                <span class="text-gray-700 mr-4">Welcome, {{ user.email }}</span>
+                <!-- <a href="{% url 'profile' %}" class="text-blue-600 hover:text-blue-800 mr-4">Profile</a> -->
+                <a href="{% url 'logout' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">Login</a>
+                <a href="{% url 'signup' %}" class="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded hover:bg-blue-50">Sign Up</a>
+            {% endif %}
+            <button class="md:hidden text-gray-700 hover:text-blue-600 focus:outline-none" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            </div>
+        </div>
+        <!-- Mobile menu, hidden by default -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-4 py-2">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        placeholder="Search location..." 
+                        class="w-full px-3 py-1 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                    >
+                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-500">
+                        <i class="fas fa-search text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <a class="block py-2 px-4 text-gray-700 hover:bg-blue-100" href="{% url 'index' %}">Home</a>
+            <a class="block py-2 px-4 text-gray-700 hover:bg-blue-100" href="{% url 'explore' %}">Explore</a>
+            <a class="block py-2 px-4 text-gray-700 hover:bg-blue-100" href="{% url 'about' %}">About</a>
+            <a class="block py-2 px-4 text-gray-700 hover:bg-blue-100" href="{% url 'contact' %}">Contact</a>
+        </div>
+    </header>
+    <main class="p-4">
+        <div class="container mx-auto px-4 py-8">
+            <!-- Slider Section -->
+            <section class="relative overflow-hidden mb-12">
+                <div id="slider" class="flex transition-transform duration-500 ease-in-out">
+                    <!-- Slides will be added here -->
+                </div>
+                <button id="prevBtn" class="absolute top-1/2 left-4 bg-white text-custom-orange p-2 rounded-full transform -translate-y-1/2 hover:bg-custom-orange hover:text-white transition-colors duration-300">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="nextBtn" class="absolute top-1/2 right-4 bg-white text-custom-orange p-2 rounded-full transform -translate-y-1/2 hover:bg-custom-orange hover:text-white transition-colors duration-300">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </section>
+    
+            <!-- Popular Destinations Section -->
+            <section class="mt-12 bg-gray-50 py-8">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Popular Destinations Near You</h2>
+                    <div id="localDestinations" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Cards will be added here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <section class="mt-8 bg-custom-orange text-white p-4 rounded-lg">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <img alt="TravelWorld logo" class="w-12 h-12 rounded-full" height="50" src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=50&h=50&q=80" width="50"/>
+                <p>Share TravelWorld with your friends</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hover:text-gray-300 transition duration-300">
+                    <i class="fab fa-instagram text-2xl"></i>
+                </a>
+                <a href="#" class="hover:text-gray-300 transition duration-300">
+                    <i class="bi bi-twitter-x"></i>
+                </a>
+                <a href="#" class="hover:text-gray-300 transition duration-300">
+                    <i class="fab fa-facebook text-2xl"></i>
+                </a>
+            </div>
+            <div class="flex items-center space-x-2 mt-4 md:mt-0">
+                <i class="fas fa-heart"></i>
+                <span>1M+ Happy Travelers</span>
+            </div>
+        </div>
+    </section>
+    </main>
+    <!-- All your existing scripts should be here, at the end of the body -->
+    <script>
+        // Add this function at the start of your script
+        function getSearchQueryFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('q') || sessionStorage.getItem('searchQuery') || '';
+        }
+        function openInGoogleMaps(address) {
+            const encodedAddress = encodeURIComponent(address);
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+            window.open(mapsUrl, '_blank');
+}
+        // 1. Utility Function for Images
+        async function getUnsplashPhoto(place) {
+            const unsplashApiKey = 'xsQtgeJUwdfjC4eutojXElJsX3AHGfXSe6Qaoyo-kqk';
+            try {
+                const searchTerms = [
+                    place.name,                                              // Exact place name
+                    place.location?.locality || place.location?.region,      // City/Region
+                    place.categories?.[0]?.name,                            // Category name
+                    'landmark',                                             // Additional context
+                    'tourism'                                               // Additional context
+                ].filter(Boolean).join(' ');
+    
+                console.log('Searching Unsplash for:', searchTerms);
+    
+                const response = await fetch(
+                    `https://api.unsplash.com/photos/random?query=${encodeURIComponent(searchTerms)}&client_id=${unsplashApiKey}&orientation=landscape&content_filter=high`, {
+                    headers: {
+                        'Accept-Version': 'v1'
+                    }
+                });
+    
+                if (!response.ok) throw new Error('Failed to fetch Unsplash image');
+                const data = await response.json();
+                
+                console.log('Image found for', place.name, ':', data.urls.regular);
+                
+                return data.urls.regular;
+            } catch (error) {
+                console.error('Error fetching Unsplash photo for', place.name, ':', error);
+                
+                try {
+                    const fallbackSearch = place.categories?.[0]?.name || 'tourist attraction';
+                    const fallbackResponse = await fetch(
+                        `https://api.unsplash.com/photos/random?query=${encodeURIComponent(fallbackSearch)}&client_id=${unsplashApiKey}&orientation=landscape`, {
+                        headers: {
+                            'Accept-Version': 'v1'
+                        }
+                    });
+                    
+                    if (!fallbackResponse.ok) throw new Error('Fallback search failed');
+                    const fallbackData = await fallbackResponse.json();
+                    return fallbackData.urls.regular;
+                } catch (fallbackError) {
+                    console.error('Fallback search also failed:', fallbackError);
+                    return 'https://images.unsplash.com/photo-1572883454114-1cf0031ede2a?auto=format&fit=crop&w=800&q=80';
+                }
+            }
+        }
+    
+        // 2. Foursquare API Function
+        async function getPlacesFromFoursquare(latitude, longitude) {
+            const FOURSQUARE_API_KEY = 'fsq3P1zhyo+P9HV8z6AEqqmMaGf07T8XkAKtgc7ISepCQdo=';
+            try {
+                const response = await fetch(
+                    `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=20000&categories=16000,16003,16004,16005,16006&limit=8&sort=POPULARITY&fields=fsq_id,name,categories,location,distance,rating,popularity,stats,description,tel,website,hours,photos`, {
+                    headers: {
+                        'Authorization': FOURSQUARE_API_KEY,
+                        'Accept': 'application/json'
+                    }
+                });
+    
+                if (!response.ok) throw new Error('Foursquare API request failed');
+                const data = await response.json();
+                
+                if (!data.results || data.results.length === 0) {
+                    throw new Error('No tourist attractions found in this location');
+                }
+    
+                return data.results
+                    .sort(() => Math.random() - 0.5)  // Shuffle the results
+                    .slice(0, 8);                     // Take only 8 places
+            } catch (error) {
+                console.error('Error fetching from Foursquare:', error);
+                return null;
+            }
+        }
+    
+        // 3. Create Attraction Card
+        async function createAttractionCard(place, index) {
+            try {
+                const imageUrl = await getUnsplashPhoto(place);
+                
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img 
+                            alt="${place.name}" 
+                            class="w-full h-48 object-cover" 
+                            src="${imageUrl}"
+                        />
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${place.name}</h3>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-600">Rating</span>
+                                <div class="flex items-center ml-2">
+                                    <div class="flex text-yellow-400">
+                                        ${'★'.repeat(Math.floor(place.rating/2))}${(place.rating/2) % 1 >= 0.5 ? '½' : ''}${'☆'.repeat(5-Math.ceil(place.rating/2))}
+                                    </div>
+                                    <span class="ml-2 text-custom-orange font-medium">
+                                        ${(place.rating/2).toFixed(1)}/5
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return card;
+            } catch (error) {
+                console.error(`Error creating card for ${place.name}:`, error);
+                return null;
+            }
+        }
+    
+        // 4. Create Slider Slide
+        async function createSlide(place) {
+            try {
+                const imageUrl = await getUnsplashPhoto(place);
+                
+                const slide = document.createElement('div');
+                slide.className = 'min-w-full box-border relative';
+                slide.innerHTML = `
+                    <img 
+                        alt="${place.name}" 
+                        class="w-full h-64 md:h-96 object-cover rounded-lg" 
+                        src="${imageUrl}"
+                    />
+                    <div class="absolute top-0 left-0 p-4 md:p-8 text-white bg-black bg-opacity-50 rounded-lg m-2 md:m-4 max-w-full md:max-w-2xl">
+                        <h2 class="text-custom-orange text-sm md:text-lg">
+                            ${place.categories?.[0]?.name || 'Tourist Attraction'}
+                            ${place.popularity >= 0.8 ? '<span class="ml-2 bg-custom-orange text-white px-2 py-1 rounded-full text-xs">Popular</span>' : ''}
+                        </h2>
+                        <h1 class="text-3xl md:text-5xl font-bold mb-2 md:mb-4">${place.name}</h1>
+                        <div class="flex flex-wrap items-center space-x-2 md:space-x-4 mb-2 md:mb-4">
+                        <span class="flex items-center space-x-2 cursor-pointer hover:text-blue-600" 
+                            onclick="openInGoogleMaps('${place.location?.formatted_address || `${place.location?.locality || place.location?.region}, ${place.location?.country}`}')">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${place.location?.formatted_address || `${place.location?.locality || place.location?.region}, ${place.location?.country}`}</span>
+                        </span>
+                            <span class="flex items-center space-x-2">
+                                <i class="fas fa-walking"></i>
+                                <span>${(place.distance / 1000).toFixed(1)}km away</span>
+                            </span>
+                            <span class="flex items-center space-x-2">
+                                <i class="fas fa-star"></i>
+                                <span>${(place.rating/2).toFixed(1)}/5 ${place.stats?.totalRatings ? `(${place.stats.totalRatings} reviews)` : ''}</span>
+                            </span>
+                        </div>
+                        <div class="flex space-x-2 md:space-x-4">
+                            <button class="px-3 py-1 md:px-6 md:py-2 bg-custom-orange text-white rounded text-sm md:text-base hover:bg-white hover:text-custom-orange transition duration-300">Visit Now</button>
+                            <button class="px-3 py-1 md:px-6 md:py-2 bg-white text-custom-orange rounded text-sm md:text-base hover:bg-custom-orange hover:text-white transition duration-300">Learn More</button>
+                        </div>
+                    </div>
+                `;
+                return slide;
+            } catch (error) {
+                console.error(`Error creating slide for ${place.name}:`, error);
+                return null;
+            }
+        }
+    
+        // 5. Initialize Slider Controls
+        function initializeSliderControls() {
+            const slider = document.getElementById('slider');
+            let currentIndex = 0;
+            const slides = slider.children;
+            const totalSlides = slides.length;
+    
+            function showSlide(index) {
+                slider.style.transform = `translateX(-${index * 100}%)`;
+            }
+    
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                showSlide(currentIndex);
+            });
+    
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                showSlide(currentIndex);
+            });
+    
+            
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                showSlide(currentIndex);
+            }, 5000);
+        }
+    
+        // 6. Main Functions
+        async function updateLocalDestinations() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(async function(position) {
+                    try {
+                        const places = await getPlacesFromFoursquare(position.coords.latitude, position.coords.longitude);
+                        if (!places) throw new Error('Failed to fetch places');
+    
+                        const container = document.getElementById('localDestinations');
+                        container.innerHTML = '';
+    
+                        for (let [index, place] of places.entries()) {
+                            const card = await createAttractionCard(place, index);
+                            if (card) container.appendChild(card);
+                        }
+                    } catch (error) {
+                        console.error("Error updating local destinations:", error);
+                        document.getElementById('localDestinations').innerHTML = `
+                            <div class="text-center text-gray-500 p-8">
+                                Unable to load destinations. Please try again later.
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
+    
+        async function initializeSlider() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(async function(position) {
+                    try {
+                        const places = await getPlacesFromFoursquare(position.coords.latitude, position.coords.longitude);
+                        if (!places) throw new Error('Failed to fetch places');
+    
+                        const slider = document.getElementById('slider');
+                        slider.innerHTML = '';
+    
+                        for (let place of places) {
+                            const slide = await createSlide(place);
+                            if (slide) slider.appendChild(slide);
+                        }
+    
+                        if (slider.children.length > 0) {
+                            initializeSliderControls();
+                        }
+                    } catch (error) {
+                        console.error("Error initializing slider:", error);
+                        document.getElementById('slider').innerHTML = `
+                            <div class="w-full h-64 md:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
+                                <p class="text-gray-500">Unable to load content. Please try again later.</p>
+                            </div>
+                        `;
+                    }
+                });
+            }
+        }
+    
+        // 7. Initialize Everything
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing search...');
+            initializeSearch();
+            
+            // Get search query from URL or sessionStorage
+            const searchQuery = getSearchQueryFromURL();
+            
+            if (searchQuery) {
+                // Update search input with the query
+                const searchInput = document.querySelector('input[placeholder="Search location..."]');
+                if (searchInput) {
+                    searchInput.value = searchQuery;
+                }
+                
+                // Load destinations for the search query
+                await loadDestinations(searchQuery);
+                
+                // Clear the sessionStorage
+                sessionStorage.removeItem('searchQuery');
+            } else {
+                // Load default destinations based on user location
+                await loadDestinations();
+            }
+        });
+    
+        // 1. Add this new function to get coordinates from place name
+        async function getCoordinatesFromPlace(placeName) {
+            const geocodingApiKey = 'a33c78ca2c62432ab1ac0e03dc7c0912';
+            try {
+                const response = await fetch(
+                    `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(placeName)}&key=${geocodingApiKey}&limit=1`
+                );
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    const result = data.results[0];
+                    console.log('Geocoding result:', result);
+                    
+                    return {
+                        latitude: result.geometry.lat,
+                        longitude: result.geometry.lng,
+                        formatted: result.formatted // Store the formatted address for display
+                    };
+                }
+                throw new Error('Location not found');
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                return null;
+            }
+        }
+    
+        // 2. Update the loadDestinations function to use the formatted address
+        async function loadDestinations(searchQuery = '') {
+            const locationContainer = document.getElementById('localDestinations');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'text-center text-gray-500 p-8';
+            loadingDiv.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading destinations...';
+            locationContainer.innerHTML = '';
+            locationContainer.appendChild(loadingDiv);
+    
+            try {
+                let coordinates;
+                
+                if (searchQuery.trim()) {
+                    // Get coordinates from search query
+                    coordinates = await getCoordinatesFromPlace(searchQuery);
+                    if (!coordinates) throw new Error('Location not found');
+                    
+                    // Update section title with formatted address
+                    document.querySelector('h2.text-2xl').textContent = 
+                        `Popular Destinations in ${coordinates.formatted}`;
+                } else {
+                    // Get user's coordinates
+                    coordinates = await new Promise((resolve, reject) => {
+                        if ("geolocation" in navigator) {
+                            navigator.geolocation.getCurrentPosition(
+                                async position => {
+                                    // Reverse geocode user's location for display
+                                    const response = await fetch(
+                                        `https://api.opencagedata.com/geocode/v1/json?q=${position.coords.latitude}+${position.coords.longitude}&key=a33c78ca2c62432ab1ac0e03dc7c0912&limit=1`
+                                    );
+                                    const data = await response.json();
+                                    const formatted = data.results[0]?.formatted || 'Your Location';
+                                    
+                                    resolve({
+                                        latitude: position.coords.latitude,
+                                        longitude: position.coords.longitude,
+                                        formatted: formatted
+                                    });
+                                },
+                                reject
+                            );
+                        } else {
+                            reject(new Error('Geolocation not available'));
+                        }
+                    });
+                    
+                    // Reset section title with user's location
+                    document.querySelector('h2.text-2xl').textContent = 
+                        `Popular Destinations Near ${coordinates.formatted}`;
+                }
+    
+                // Fetch places from Foursquare
+                const places = await getPlacesFromFoursquare(
+                    coordinates.latitude, 
+                    coordinates.longitude
+                );
+                
+                if (!places || places.length === 0) {
+                    throw new Error('No destinations found in this location');
+                }
+    
+                // Clear loading state
+                locationContainer.innerHTML = '';
+    
+                // Update UI with places
+                for (let place of places) {
+                    const card = await createAttractionCard(place);
+                    if (card) locationContainer.appendChild(card);
+                }
+    
+                // Update slider
+                const slider = document.getElementById('slider');
+                slider.innerHTML = '';
+                
+                for (let place of places) {
+                    const slide = await createSlide(place);
+                    if (slide) slider.appendChild(slide);
+                }
+    
+                if (slider.children.length > 0) {
+                    initializeSliderControls();
+                }
+    
+            } catch (error) {
+                console.error('Error loading destinations:', error);
+                locationContainer.innerHTML = `
+                    <div class="text-center text-gray-500 p-8">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        ${error.message || 'Unable to load destinations. Please try again later.'}
+                    </div>
+                `;
+            }
+        }
+    
+        // 3. Enhance the search initialization with better UX
+        function initializeSearch() {
+            const searchInput = document.querySelector('input[placeholder="Search location..."]');
+            const searchForm = searchInput.closest('form');
+            const searchButton = searchForm.querySelector('button[type="submit"]');
+            let debounceTimer;
+    
+            // Add loading state
+            const setLoadingState = (loading) => {
+                searchButton.innerHTML = loading ? 
+                    '<i class="fas fa-spinner fa-spin"></i>' : 
+                    '<i class="fas fa-search text-sm"></i>';
+                searchInput.disabled = loading;
+            };
+    
+            // Handle search input with debounce
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const query = e.target.value.trim();
+                
+                // Show/hide clear button
+                clearButton.style.display = query ? 'block' : 'none';
+    
+                // Only search if query is 3+ characters or empty
+                if (query.length >= 3 || query.length === 0) {
+                    debounceTimer = setTimeout(() => {
+                        console.log('Searching for:', query);
+                        setLoadingState(true);
+                        
+                        // Update URL without reloading the page
+                        const newUrl = query ? 
+                            `${window.location.pathname}?q=${encodeURIComponent(query)}` : 
+                            window.location.pathname;
+                        window.history.pushState({}, '', newUrl);
+                        
+                        loadDestinations(query).finally(() => setLoadingState(false));
+                    }, 500);
+                }
+            });
+    
+            // Handle form submission
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query) {
+                    console.log('Form submitted with:', query);
+                    setLoadingState(true);
+                    
+                    // Update URL without reloading the page
+                    const newUrl = `${window.location.pathname}?q=${encodeURIComponent(query)}`;
+                    window.history.pushState({}, '', newUrl);
+                    
+                    loadDestinations(query).finally(() => setLoadingState(false));
+                }
+            });
+    
+            // Add clear button functionality
+            const clearButton = document.createElement('button');
+            clearButton.type = 'button';
+            clearButton.className = 'absolute right-8 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600';
+            clearButton.innerHTML = '<i class="fas fa-times"></i>';
+            clearButton.style.display = 'none';
+    
+            searchForm.appendChild(clearButton);
+    
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                clearButton.style.display = 'none';
+                setLoadingState(true);
+                
+                // Update URL without reloading the page
+                window.history.pushState({}, '', window.location.pathname);
+                
+                loadDestinations('').finally(() => setLoadingState(false));
+            });
+    
+            // Handle browser back/forward navigation
+            window.addEventListener('popstate', () => {
+                const query = getSearchQueryFromURL();
+                searchInput.value = query;
+                loadDestinations(query);
+            });
+        }
+    </script>
+<!-- Chat Icon and Window -->
+<button onclick="toggleChat()" class="chat-icon bg-blue-600 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg pulse">
+    <img src="chatbotimage.png" alt="Chat Bot" class="w-12 h-12 object-contain">
+</button>
+
+<!-- Chat Window (initially hidden) -->
+<div id="chatWindow" class="chat-window hidden">
+    <iframe src="chatbot.html" width="320" height="500" frameborder="0" class="rounded-lg shadow-lg"></iframe>
+</div>
+
+<script>
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        chatWindow.classList.toggle('hidden');
+    }
+
+    // Close chat window when clicking outside
+    document.addEventListener('click', function(event) {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatIcon = event.target.closest('.chat-icon');
+        const chatFrame = event.target.closest('.chat-window');
+        
+        if (!chatIcon && !chatFrame && !chatWindow.classList.contains('hidden')) {
+            chatWindow.classList.add('hidden');
+        }
+    });
+
+    // Prevent closing when clicking inside chat window
+    document.getElementById('chatWindow').addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+</script>
+</body>
+</html>
